@@ -1,4 +1,4 @@
-byte sensorPin       = 3; //18, 19, 20, 21; 2 and 3 don't work properly while LCD shield connected
+byte sensorPin       = 3; //2, 3, 18, 19, 20, 21
 const float factor = 4.5; // 4.5 pulses per second per litre/minute of flow. 
 
 volatile int pulseCount;  
