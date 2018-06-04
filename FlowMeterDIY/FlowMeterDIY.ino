@@ -3,8 +3,8 @@ const float factor = 4.5; // 4.5 pulses per second per litre/minute of flow.
 
 volatile int pulseCount;  
 float flow;
-unsigned int flowMilliLitres;
-unsigned long totalMilliLitres;
+unsigned int flowMl;
+unsigned long totalMl;
 unsigned long oldTime;
 
 void setup(){
@@ -12,11 +12,11 @@ void setup(){
   pinMode(sensorPin, INPUT);
   digitalWrite(sensorPin, HIGH);
 
-  pulseCount        = 0;
-  flow              = 0.0;
-  flowMilliLitres   = 0;
-  totalMilliLitres  = 0;
-  oldTime           = 0;
+  pulseCount = 0;
+  flow       = 0.0;
+  flowMl     = 0;
+  totalMl    = 0;
+  oldTime    = 0;
 
   attachInterrupt(digitalPinToInterrupt(sensorPin), pulseCounter, FALLING);
 }
@@ -34,10 +34,10 @@ void loop() {
         float quantTime = 1000.0 / (current - oldTime);
         flow = quantTime * pulseCount / factor; // L/min
         
-        //flowMilliLitres = (flow / 60) * 1000;
-        //totalMilliLitres += flowMilliLitres;
+        flowMl = (flow / 60) * 1000;
+        totalMl += flowMl;
  
-        Serial.println("Flow rate: "+toReadable(flow)+" L/min");
+        Serial.println("Flow rate: "+toReadable(flow)+" L/min Added "+String(flowMl)+" ml, Total: "+totalMl+"ml");
         oldTime = current;
         pulseCount = 0;
         attachInterrupt(digitalPinToInterrupt(sensorPin), pulseCounter, FALLING);
