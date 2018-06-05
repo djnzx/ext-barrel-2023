@@ -49,6 +49,9 @@ bool useSensor;
 int voltage_val[] = { 110, 230, 337, 454, 570, 690, 810, 920 };
 int pressure_val[] = { 00, 100, 200, 300, 400, 500, 600, 700 };
 int array_length = sizeof(voltage_val)/sizeof(int);
+const int TAIL_SIZE=5;
+int p_tail[TAIL_SIZE];
+int p_position;
 
 // flow
 volatile int pulseCount;  
@@ -249,11 +252,23 @@ void setup() {
   totalMl    = 0;
   oldTime    = 0;
 
+  // initial filling array
+  int p = read_pressure();
+  for (int i=0;i<TAIL_SIZE;i++) {
+    p_tail[i]=p;
+  }
+  p_position=0;
+
   attachService();
 }
 
 int read_pressure() {
-  return analogRead(PORT_PRESSURE_SENSOR);
+  p_tail[p_position % TAIL_SIZE]=analogRead(PORT_PRESSURE_SENSOR);
+  int s=0;
+  for (int i = 0; i < TAIL_SIZE; ++i) {
+    s+=p_tail[i];
+  }
+  return s/TAIL_SIZE;
 }
 
 void doCore() {
