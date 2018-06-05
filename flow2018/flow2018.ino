@@ -8,7 +8,7 @@
  * second line shows the current flow if the sensor connected
  * ----------------
  * 2.40/3*80 P:3.25
- * F:15.5lm A V1024  
+ * F:15.2lm A V1024  
  * ----------------
  */
 #include <LiquidCrystal.h>
@@ -122,30 +122,42 @@ void inc_high() {
 
 String floatToReadable(float val) {
   int roun = int(val);
-  int frac = (val - int(val)) * 10;
-  return String(roun)+"."+String(frac);
+  //int frac = (val - int(val)) * 10;
+  int frac=int(val*10)-int(val)*10;
+  return
+    (roun<10 ? " " : "") + 
+    String(roun) + 
+    "." + 
+    String(frac);
 }
 
-String intToReadable(int value) {
+String intToReadable(int value, bool special) {
   int digit1 = value / 100;
   int digit2 = (value % 100) / 10;
   int digit3 = value % 10;
-  return String(digit1)+"."+String(digit2)+String(digit3);
+  return String(digit1) +
+    (special ? "*" : ".") +
+    String(digit2) + String(digit3);
 }
 
 String getLineContent1() {
    return
-     intToReadable(pressure_low)+
-     "/"+intToReadable(pressure_high)+
-     " C:"+intToReadable(volt_to_press(pressure_current_volt))+" ";
+     intToReadable(pressure_low, current_position==PRESS_LOW) +
+     "/" +
+     intToReadable(pressure_high, current_position==PRESS_HIGH) +
+     " C:" +
+     intToReadable(volt_to_press(pressure_current_volt), false) + " ";
 }
 
 String getLineContent2() {
    return
-     String(useSensor ? "A" : "M")
-     +"V:"+
-     String(pressure_current_volt)
-     +" ";
+     "F:" + 
+     floatToReadable(flow) + 
+     "lm " +
+     String(useSensor ? "A" : "M") +
+     " V" +
+     String(pressure_current_volt) +
+     " ";
 }
 
 void selectLow() {
@@ -237,20 +249,6 @@ void setup() {
   attachService();
 }
 
-void displayLine1() {
-  lcd.setCursor(0,0);
-  lcd.print(getLineContent1());  
-}
-
-void displayLine2() {
-  lcd.setCursor(2,1);
-  lcd.print(current_position == PRESS_LOW ? "*" : " ");
-  lcd.setCursor(7,1);
-  lcd.print(current_position == PRESS_HIGH ? "*" : " ");
-  lcd.setCursor(9,1);
-  lcd.print(getLineContent2());  
-}
-
 int read_pressure() {
   return analogRead(PORT_PRESSURE_SENSOR);
 }
@@ -270,8 +268,10 @@ void doCore() {
 }
 
 void display() {
-  displayLine1();
-  displayLine2();
+  lcd.setCursor(0,0);
+  lcd.print(getLineContent1());  
+  lcd.setCursor(0,1);
+  lcd.print(getLineContent2());  
 }
 
 void processKeys() {
