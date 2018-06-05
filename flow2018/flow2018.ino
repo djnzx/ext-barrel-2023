@@ -45,9 +45,12 @@ bool statusRelay;
 bool useSensor;
 // LX: 5149062AA, 
 // not checked subst: 5149062AB, 56028807AA, 56028807AB, 5080472AA, 5093908AA, 56044777AA, 68060337AA, 1S7937,  5149064AA, 514906AA, PS401, PS598, PS701, 1S6755, 1S10853
-// not working WJ: 56028807AA, 56028807AB, PS317
-int voltage_val[] = { 110, 230, 337, 454, 570, 690, 810, 920 };
-int pressure_val[] = { 00, 100, 200, 300, 400, 500, 600, 700 };
+//int voltage_val[] = { 110, 230, 337, 454, 570, 690, 810, 920 };
+//int pressure_val[] = { 00, 100, 200, 300, 400, 500, 600, 700 };
+
+// WJ: 56028807AA, 56028807AB, PS317
+int voltage_val[] = { 110, 220, 337, 454, 570, 660, 690, 810, 920 };
+int pressure_val[] = { 00, 100, 200, 300, 400, 470 ,500, 600, 700 };
 int array_length = sizeof(voltage_val)/sizeof(int);
 const int TAIL_SIZE=5;
 int p_tail[TAIL_SIZE];
@@ -199,12 +202,12 @@ void switchPump() {
 }
 
 void relayOn() {
-  digitalWrite(PORT_RELAY_PUMP, LOW);
+  digitalWrite(PORT_RELAY_PUMP, HIGH);
   statusRelay = true;
 }
 
 void relayOff() {
-  digitalWrite(PORT_RELAY_PUMP, HIGH);
+  digitalWrite(PORT_RELAY_PUMP, LOW);
   statusRelay = false;
 }
 
@@ -242,7 +245,7 @@ void setup() {
   relayOff();
   update_pressures_volt();
 
-  // Serial.begin(38400); // debug purposes only
+  Serial.begin(38400); // debug purposes only
   pinMode(PORT_SENSOR_FLOW, INPUT);
   digitalWrite(PORT_SENSOR_FLOW, HIGH);
 
