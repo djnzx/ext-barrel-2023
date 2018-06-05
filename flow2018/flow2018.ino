@@ -264,6 +264,7 @@ void setup() {
 
 int read_pressure() {
   p_tail[p_position % TAIL_SIZE]=analogRead(PORT_PRESSURE_SENSOR);
+  p_position++;
   int s=0;
   for (int i = 0; i < TAIL_SIZE; ++i) {
     s+=p_tail[i];
