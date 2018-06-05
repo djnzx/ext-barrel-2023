@@ -13,6 +13,7 @@
  */
 #include <LiquidCrystal.h>
 LiquidCrystal lcd(8, 9, 4, 5, 6, 7); // D
+#define PORT_LCD_BUTTONS A0
 
 #define btnNONE   0
 #define btnRIGHT  1
@@ -23,14 +24,22 @@ LiquidCrystal lcd(8, 9, 4, 5, 6, 7); // D
 
 #define MIN_VALUE 100
 #define MAX_VALUE 400
+// with those settings we have 31 sec work / 23 sec idle cycle
 #define DEFAULT_MIN_VALUE 240
-#define DEFAULT_MAX_VALUE 400
+#define DEFAULT_MAX_VALUE 390
 #define PRESS_LOW 1
 #define PRESS_HIGH 2
 
 #define PORT_PRESSURE_SENSOR A1 // A
-#define PORT_RELAY_PUMP  3 // D
 #define PORT_SENSOR_FLOW 2 // D
+#define PORT_RELAY_PUMP  3 // D
+ /* 
+  *  used to switch relay ON/OFF
+  *  outside module uses `HIGH`
+  *  inside module uses `LOW`
+  */
+#define RELAY_SWITCH_ON_TYPE HIGH
+#define RELAY_SWITCH_OFF_TYPE LOW
 
 const float factor = 4.5; // 4.5 pulses per second per litre/minute of flow. 
 
@@ -43,14 +52,11 @@ int current_position;
 bool statusRelay;
 // used for 'mute' the sensor, if low=high we don't use the sensor's value for relay control.
 bool useSensor;
-// LX: 5149062AA, 
-// not checked subst: 5149062AB, 56028807AA, 56028807AB, 5080472AA, 5093908AA, 56044777AA, 68060337AA, 1S7937,  5149064AA, 514906AA, PS401, PS598, PS701, 1S6755, 1S10853
-//int voltage_val[] = { 110, 230, 337, 454, 570, 690, 810, 920 };
-//int pressure_val[] = { 00, 100, 200, 300, 400, 500, 600, 700 };
 
-// WJ: 56028807AA, 56028807AB, PS317
-int voltage_val[] = { 110, 220, 337, 454, 570, 660, 690, 810, 920 };
-int pressure_val[] = { 00, 100, 200, 300, 400, 470 ,500, 600, 700 };
+// checked, used: 5149062AA, PS317
+// not checked: 5149062AB, 56028807AA, 56028807AB, 5080472AA, 5093908AA, 56044777AA, 68060337AA, 1S7937,  5149064AA, 514906AA, PS401, PS598, PS701, 1S6755, 1S10853, 
+int voltage_val[] = { 110, 220, 337, 454, 570, 690, 810, 920 };
+int pressure_val[] = { 00, 100, 200, 300, 400, 500, 600, 700 };
 int array_length = sizeof(voltage_val)/sizeof(int);
 const int TAIL_SIZE=5;
 int p_tail[TAIL_SIZE];
@@ -131,7 +137,6 @@ void inc_high() {
 
 String floatToReadable(float val) {
   int roun = int(val);
-  //int frac = (val - int(val)) * 10;
   int frac=int(val*10)-int(val)*10;
   return
     (roun<10 ? " " : "") + 
@@ -140,6 +145,11 @@ String floatToReadable(float val) {
     String(frac);
 }
 
+/*
+ * we use bool special
+ * for special marker '*' to divide fractional part
+ * to indicate where cursow now is
+ */
 String intToReadable(int value, bool special) {
   int digit1 = value / 100;
   int digit2 = (value % 100) / 10;
@@ -202,12 +212,12 @@ void switchPump() {
 }
 
 void relayOn() {
-  digitalWrite(PORT_RELAY_PUMP, HIGH);
+  digitalWrite(PORT_RELAY_PUMP, RELAY_SWITCH_ON_TYPE);
   statusRelay = true;
 }
 
 void relayOff() {
-  digitalWrite(PORT_RELAY_PUMP, LOW);
+  digitalWrite(PORT_RELAY_PUMP, RELAY_SWITCH_OFF_TYPE);
   statusRelay = false;
 }
 
@@ -216,12 +226,12 @@ bool isRelayOn() {
 }
 
 int read_button() {
-  int in = analogRead(0); // 0 - port, which used to read buttons
+  int in = analogRead(PORT_LCD_BUTTONS); // 0 - port, which used to read buttons
   if (in >= 700) return btnNONE; 
-  if (in < 50)   return btnRIGHT; // 0  
-  if (in < 150)  return btnUP; // 97
-  if (in < 300)  return btnDOWN; // 253
-  if (in < 450)  return btnLEFT;  // 405
+  if (in < 50)   return btnRIGHT;   // 0  
+  if (in < 150)  return btnUP;      // 97
+  if (in < 300)  return btnDOWN;    // 253
+  if (in < 450)  return btnLEFT;    // 405
   if (in < 700)  return btnSELECT;  // 638
 }
 
@@ -233,36 +243,34 @@ void detachService() {
   detachInterrupt(digitalPinToInterrupt(PORT_SENSOR_FLOW));
 }
 
+void init_pressure_averager() {
+  int p = read_pressure();
+  for (int i=0;i<TAIL_SIZE;i++) {
+      p_tail[i]=p;
+  }
+  p_position=0;
+}
+
 void setup() {
   pinMode(PORT_RELAY_PUMP, OUTPUT);
-  // swith pull up resistor to avoid unexpected behavior without sensor 
+  pinMode(PORT_SENSOR_FLOW, INPUT);
+  digitalWrite(PORT_SENSOR_FLOW, HIGH);
   digitalWrite(PORT_PRESSURE_SENSOR, HIGH);
   lcd.begin(16, 2);
   pressure_low = DEFAULT_MIN_VALUE;
   pressure_high = DEFAULT_MAX_VALUE;
+  update_pressures_volt();
   current_position = PRESS_LOW;
   useSensor=true;
   relayOff();
-  update_pressures_volt();
-
-  Serial.begin(38400); // debug purposes only
-  pinMode(PORT_SENSOR_FLOW, INPUT);
-  digitalWrite(PORT_SENSOR_FLOW, HIGH);
-
   pulseCount = 0;
   flow       = 0.0;
   flowMl     = 0;
   totalMl    = 0;
   oldTime    = 0;
-
-  // initial filling array
-  int p = read_pressure();
-  for (int i=0;i<TAIL_SIZE;i++) {
-    p_tail[i]=p;
-  }
-  p_position=0;
-
+  init_pressure_averager();
   attachService();
+  Serial.begin(38400); // debug purposes only
 }
 
 int read_pressure() {
@@ -275,7 +283,7 @@ int read_pressure() {
   return s/TAIL_SIZE;
 }
 
-void doCore() {
+void doPumpControl() {
   // volt range 230..570
   pressure_current_volt = read_pressure();
   update_useSensor();
@@ -319,7 +327,7 @@ void processKeys() {
        break;
     }
     case btnNONE: {
-       doCore();
+       doPumpControl();
     }
   }
 }
@@ -348,7 +356,6 @@ void loop() {
   delay(200);
 }
 
-// interrupt service
 void interruptService() {
     pulseCount++;
 }
