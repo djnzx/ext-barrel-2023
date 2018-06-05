@@ -43,6 +43,9 @@ int current_position;
 bool statusRelay;
 // used for 'mute' the sensor, if low=high we don't use the sensor's value for relay control.
 bool useSensor;
+// LX: 5149062AA, 
+// not checked subst: 5149062AB, 56028807AA, 56028807AB, 5080472AA, 5093908AA, 56044777AA, 68060337AA, 1S7937,  5149064AA, 514906AA, PS401, PS598, PS701, 1S6755, 1S10853
+// not working WJ: 56028807AA, 56028807AB, PS317
 int voltage_val[] = { 110, 230, 337, 454, 570, 690, 810, 920 };
 int pressure_val[] = { 00, 100, 200, 300, 400, 500, 600, 700 };
 int array_length = sizeof(voltage_val)/sizeof(int);
