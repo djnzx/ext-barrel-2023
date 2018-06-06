@@ -43,24 +43,24 @@ LiquidCrystal lcd(8, 9, 4, 5, 6, 7); // D
 
 const float factor = 4.5; // 4.5 pulses per second per litre/minute of flow. 
 
-int pressure_low;
-int pressure_high;
-int pressure_low_volt;
-int pressure_high_volt;
-int pressure_current_volt;
-int current_position;
+unsigned int pressure_low;
+unsigned int pressure_high;
+unsigned int pressure_low_volt;
+unsigned int pressure_high_volt;
+unsigned int pressure_current_volt;
+unsigned int current_position;
 bool statusRelay;
 // used for 'mute' the sensor, if low=high we don't use the sensor's value for relay control.
 bool useSensor;
 
 // checked, used: 5149062AA, PS317
 // not checked: 5149062AB, 56028807AA, 56028807AB, 5080472AA, 5093908AA, 56044777AA, 68060337AA, 1S7937,  5149064AA, 514906AA, PS401, PS598, PS701, 1S6755, 1S10853, 
-int voltage_val[] = { 110, 220, 337, 454, 570, 690, 810, 920 };
-int pressure_val[] = { 00, 100, 200, 300, 400, 500, 600, 700 };
-int array_length = sizeof(voltage_val)/sizeof(int);
-const int TAIL_SIZE=5;
-int p_tail[TAIL_SIZE];
-int p_position;
+unsigned int voltage_val[] = { 110, 220, 337, 454, 570, 690, 810, 920 };
+unsigned int pressure_val[] = { 00, 100, 200, 300, 400, 500, 600, 700 };
+unsigned int array_length = sizeof(voltage_val)/sizeof(int);
+const unsigned int TAIL_SIZE=5;
+unsigned int p_tail[TAIL_SIZE];
+unsigned int p_position;
 
 // flow
 volatile int pulseCount;  
@@ -78,7 +78,7 @@ void update_useSensor() {
   useSensor = (pressure_low != pressure_high);
 }
 
-int map(int val, int from[], int to[]) {
+unsigned int map(unsigned int val, unsigned int from[], unsigned int to[]) {
   if (val<from[0]) {
     // to avoid unexpected behavior in this case
     return to[0];
@@ -136,8 +136,8 @@ void inc_high() {
 }
 
 String floatToReadable(float val) {
-  int roun = int(val);
-  int frac=int(val*10)-int(val)*10;
+  unsigned int roun = int(val);
+  unsigned int frac=int(val*10)-int(val)*10;
   return
     (roun<10 ? " " : "") + 
     String(roun) + 
@@ -150,7 +150,7 @@ String floatToReadable(float val) {
  * for special marker '*' to divide fractional part
  * to indicate where cursow now is
  */
-String intToReadable(int value, bool special) {
+String intToReadable(unsigned int value, bool special) {
   int digit1 = value / 100;
   int digit2 = (value % 100) / 10;
   int digit3 = value % 10;
@@ -226,7 +226,7 @@ bool isRelayOn() {
 }
 
 int read_button() {
-  int in = analogRead(PORT_LCD_BUTTONS); // 0 - port, which used to read buttons
+  unsigned int in = analogRead(PORT_LCD_BUTTONS); // 0 - port, which used to read buttons
   if (in >= 700) return btnNONE; 
   if (in < 50)   return btnRIGHT;   // 0  
   if (in < 150)  return btnUP;      // 97
@@ -244,7 +244,7 @@ void detachService() {
 }
 
 void init_pressure_averager() {
-  int p = read_pressure();
+  unsigned int p = read_pressure();
   for (int i=0;i<TAIL_SIZE;i++) {
       p_tail[i]=p;
   }
@@ -275,8 +275,12 @@ void setup() {
 
 int read_pressure() {
   p_tail[p_position % TAIL_SIZE]=analogRead(PORT_PRESSURE_SENSOR);
-  p_position++;
-  int s=0;
+  if (p_position+1<TAIL_SIZE) {
+    p_position++;
+  } else {
+    p_position=0;
+  }
+  unsigned int s=0;
   for (int i = 0; i < TAIL_SIZE; ++i) {
     s+=p_tail[i];
   }
