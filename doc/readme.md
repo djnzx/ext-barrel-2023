@@ -11,3 +11,16 @@ second line shows the current flow if the sensor connected
 2.40/3*80 P:3.25
 F:15.2lm A V1024  
 ----------------
+1 gallon = 3.78541 L
+
+### trees / blueberry / black currant
+
+PCN.25 = 0.95 L / min
+PCN.50 = 1.90 L / min
+
+### dripping
+
+1 meter   = 2.2    L / h
+          = 0.0366 L / min
+15 meters = 33     L / h
+          = 0.55   L / min

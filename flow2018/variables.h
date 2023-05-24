@@ -1,26 +1,33 @@
+// LCD
+#include <LiquidCrystal.h>
+LiquidCrystal lcd(8, 9, 4, 5, 6, 7);
 // current cursor position
-unsigned int cursor_position;
+int cursor_position;
 // global state for motor relay
 bool is_motor_on;
-// current pressures for on(low) / off(high)
-unsigned int pressure_low;
-unsigned int pressure_high;
+// current pressures for on(low) / off(high), being set via UI
+int pressure_low;
+int pressure_high;
+// the same in volage, because sensor returns the voltage
+int pressure_low_volt;
+int pressure_high_volt;
+// current pressure, being read on each iteration
+int pressure_current_volt;
 // used for 'mute' the sensor
 // if low=high we don't use the sensor's value for relay control
 // we work based on SELECT button
-bool useSensor;
+bool use_sensor = true;
+bool is_manual_mode() { return !use_sensor; }
 // buffer to average pressures being read
-const unsigned int TAIL_SIZE = 5;
-unsigned int p_tail[TAIL_SIZE];
-unsigned int p_position;
+const int TAIL_SIZE = 5;
+int p_tail[TAIL_SIZE];
+int p_position = 0;
+// pulse counter
+volatile unsigned int pulse_count = 0;
+// flow, liters per minute
+float flow = 0.0;
 
 // TODO: document and clean-up
-unsigned int pressure_low_volt;
-unsigned int pressure_high_volt;
-unsigned int pressure_current_volt;
-// flow
-volatile int pulseCount;
-float flow;
-unsigned int flowMl;
-unsigned long totalMl;
-unsigned long oldTime;
+int flowMl = 0;
+long totalMl = 0;
+long oldTime = 0;

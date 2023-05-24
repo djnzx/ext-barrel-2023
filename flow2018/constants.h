@@ -24,17 +24,17 @@
 #define STEP 10
 
 // cursor position
-#define CUR_PRESS_LOW 1
+#define CUR_PRESS_LOW  1
 #define CUR_PRESS_HIGH 2
 
 // voltage to pressure mapping
 const unsigned int voltage_val[] = { 110, 220, 337, 454, 570, 690, 810, 920 };
-const unsigned int pressure_val[] = { 00, 100, 200, 300, 400, 500, 600, 700 };
+const unsigned int pressure_val[] = {  0, 100, 200, 300, 400, 500, 600, 700 };
 const unsigned int a_length = sizeof(voltage_val)/sizeof(int);
 
 // pin 2 - interrupt 0
 // pin 3 - interrupt 1
-const int couter_interrupt = digitalPinToInterrupt(PORT_SENSOR_FLOW);
+const int counter_interrupt = digitalPinToInterrupt(PORT_SENSOR_FLOW);
 
 // 4.5 pulses per second per litre/minute of flow.
 // used to convert pulses to liters

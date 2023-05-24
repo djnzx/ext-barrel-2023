@@ -7,3 +7,24 @@ int read_button() {
   if (in < 700)  return btnSELECT;  // 638
   return btnNONE;
 }
+
+// KEYBOARD OPERATIONS AFFECT ONLY: pressure_low, pressure_high, cursor_position
+void dec_low()  { if (pressure_low > MIN_VALUE)         pressure_low  -= STEP; }
+void inc_low()  { if (pressure_high - pressure_low > 1) pressure_low  += STEP; }
+void dec_high() { if (pressure_high - pressure_low > 1) pressure_high -= STEP; }
+void inc_high() { if (pressure_high < MAX_VALUE)        pressure_high += STEP; }
+
+void selectLowP()  { cursor_position = CUR_PRESS_LOW;  }
+
+void selectHighP() { cursor_position = CUR_PRESS_HIGH; }
+
+void buttonUp() {
+  if (cursor_position == CUR_PRESS_LOW) { inc_low();  }
+  else                                  { inc_high(); }
+}
+
+void buttonDown() {
+  if (cursor_position == CUR_PRESS_LOW) { dec_low();  }
+  else                                  { dec_high(); }
+}
+

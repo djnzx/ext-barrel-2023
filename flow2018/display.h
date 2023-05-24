@@ -1,13 +1,20 @@
 #include "functions.h"
 
+// actually, first digit after comma
+// 5.73 => 7
+int fractional(float x) {
+  return int (x * 10) - int (x) * 10;
+}
+
+// produces String value in format XX.X
 String floatToReadable(float val) {
-  unsigned int roun = int (val);
-  unsigned int frac = int (val * 10) - int (val) * 10;
+  int rounded = int (val);
+  String first = rounded < 10 ? " " : "";
   return
-    (roun < 10 ? " " : "") +
-    String(roun)
+    first +
+    String(rounded)
      + "." +
-    String(frac);
+    String(fractional(val)); // last digit
 }
 
 // we use bool special
@@ -40,7 +47,7 @@ String getLine2Content() {
      "F:" +
      floatToReadable(flow)
      + "lm " +
-     String(useSensor ? "A" : "M")
+     String(use_sensor ? "A" : "M")
      + " V" +
      String(pressure_current_volt)
      + " ";
