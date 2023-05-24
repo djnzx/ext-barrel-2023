@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #include "constants.h"
 #include "variables.h"
 #include "pump.h"
@@ -5,6 +6,7 @@
 #include "pressure.h"
 #include "display.h"
 #include "counter.h"
+#include "levels.h"
 
 ////////////////////////////////////////////////////////////////////////
 void setup() {
@@ -18,6 +20,7 @@ void setup() {
   pressure_low = DEFAULT_MIN_VALUE;
   pressure_high = DEFAULT_MAX_VALUE;
   // port modes
+  pinMode(PORT_BARREL_IS_EMPTY, INPUT);
   pinMode(PORT_SENSOR_FLOW, INPUT);
   pinMode(PORT_RELAY_PUMP, OUTPUT);
   init_pressure_averager();
@@ -29,6 +32,7 @@ void setup() {
 
 ////////////////////////////////////////////////////////////////////////
 void read_sensors() {
+  is_empty = read_is_empty();
   pressure_current_volt = read_pressure_avg();
 }
 
@@ -50,6 +54,10 @@ void handle_keyboard() {
 
 // DO PUMP CONTROL BASED ON THE PRESSURE READ //////////////////////////
 void do_pump_control() {
+  if (is_empty) {
+    pumpOff();
+    return;
+  }
   if (is_manual_mode()) return;
   if (pressure_current_volt >= pressure_high_volt)                pumpOff();
   if (pressure_current_volt <= pressure_low_volt && !is_motor_on) pumpOn();

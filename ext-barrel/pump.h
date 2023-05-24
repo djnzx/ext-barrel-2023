@@ -1,6 +1,8 @@
+#include <Arduino.h>
 // PUMP OPERATIONS
 
 void pumpOn() {
+  if (is_empty) return;
   digitalWrite(PORT_RELAY_PUMP, HIGH);
   is_motor_on = true;
 }

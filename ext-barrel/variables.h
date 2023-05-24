@@ -2,6 +2,9 @@
 #include <LiquidCrystal.h>
 LiquidCrystal lcd(8, 9, 4, 5, 6, 7);
 
+// safety stuff, start from empty barrel
+bool is_empty = true;
+
 // current cursor position
 int cursor_position;
 

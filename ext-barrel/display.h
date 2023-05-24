@@ -28,28 +28,28 @@ String intToReadable(unsigned int value, bool special) {
   return String(digit1) + delimiter + String(digit2) + String(digit3);
 }
 
-String getLine1Content() {
-   return
-     intToReadable(pressure_low, cursor_position == CUR_PRESS_LOW)
-     + "/" +
-     intToReadable(pressure_high, cursor_position == CUR_PRESS_HIGH)
-     + " C:" +
-     intToReadable(volt_to_press(pressure_current_volt), false)
-     + " ";
+String mk_line1() {
+  return is_empty ? IS_EMPTY_LINE1 :
+    intToReadable(pressure_low, cursor_position == CUR_PRESS_LOW)
+    + "/" +
+    intToReadable(pressure_high, cursor_position == CUR_PRESS_HIGH)
+    + " C:" +
+    intToReadable(volt_to_press(pressure_current_volt), false)
+    + " ";
 }
 
-String getLine2Content() {
-   return
-     "F:" +
-     floatToReadable(flow)
-     + "lm " +
-     String(use_sensor ? "A" : "M")
-     + " V" +
-     String(pressure_current_volt)
-     + " ";
+String mk_line2() {
+  return is_empty ? IS_EMPTY_LINE2 :
+    "F:" +
+    floatToReadable(flow)
+    + "lm " +
+    String(use_sensor ? "A" : "M")
+    + " V" +
+    String(pressure_current_volt)
+    + " ";
 }
 
 void display(LiquidCrystal lcd0) {
-  lcd0.setCursor(0, 0); lcd0.print(getLine1Content());
-  lcd0.setCursor(0, 1); lcd0.print(getLine2Content());
+  lcd0.setCursor(0, 0); lcd0.print(mk_line1());
+  lcd0.setCursor(0, 1); lcd0.print(mk_line2());
 }
