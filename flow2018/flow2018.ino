@@ -23,7 +23,8 @@ void setup() {
   init_pressure_averager();
   // flow
   attachHandler();
-  //Serial.begin(38400); // debug purposes
+  // debug purposes
+  Serial.begin(38400);
 }
 
 // DO PUMP CONTROL BASED ON THE PRESSURE READ //////////////////////////
@@ -33,19 +34,21 @@ void do_pump_control() {
   if (pressure_current_volt <= pressure_low_volt && !is_motor_on) pumpOn();
 }
 
+float calc_lpm(long spent) {
+  double actual_seconds = double(spent) / 1000;
+  double pulses_per_second = pulse_count / actual_seconds;
+  return pulses_per_second / factor;
+}
+
 ////////////////////////////////////////////////////////////////////////
 void handle_flow() {
   long curTime = millis();
   long spent = curTime - oldTime;
-
   if (spent > 1000) {
     detachHandler();
-    float quantTime = 1000.0 / spent;
-    flow = quantTime * pulse_count / factor; // L/min
-    // debug purposes
-    // flowMl = (flow / 60) * 1000;
-    // totalMl += flowMl;
-    // Serial.println("Flow rate: "+toReadable(flow)+" L/min Added "+String(flowMl)+" ml, Total: "+totalMl+"ml");
+    flow = calc_lpm(spent);
+    String msg = "Time spent: " + String(double(spent) / 1000) + "s, pulse count: " + String(pulse_count) + ", litres/minute: " + floatToReadable(flow);
+    Serial.println(msg);
     oldTime = curTime;
     pulse_count = 0;
     attachHandler();

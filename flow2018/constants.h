@@ -36,6 +36,7 @@ const unsigned int a_length = sizeof(voltage_val)/sizeof(int);
 // pin 3 - interrupt 1
 const int counter_interrupt = digitalPinToInterrupt(PORT_SENSOR_FLOW);
 
-// 4.5 pulses per second per litre/minute of flow.
 // used to convert pulses to liters
-const float factor = 4.5;
+// https://m.hi-ip.com/en/industrial-automation/sensors/flow-sensors/datchik-rashoda-zhidkosti-fs400a-g1-1-60-lmin.html
+// 1 liter / minute = 4.8 pulses / second
+const float factor = 4.8;
