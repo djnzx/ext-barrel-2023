@@ -20,6 +20,7 @@ void setup() {
   pressure_low = DEFAULT_MIN_VALUE;
   pressure_high = DEFAULT_MAX_VALUE;
   // port modes
+  pinMode(PORT_BARREL_IS_EMPTY, INPUT);
   pinMode(PORT_SENSOR_FLOW, INPUT);
   pinMode(PORT_RELAY_PUMP, OUTPUT);
   init_pressure_averager();
