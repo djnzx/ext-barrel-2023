@@ -3,6 +3,7 @@
 #define PORT_PRESSURE_SENSOR A1 // A
 #define PORT_SENSOR_FLOW      2 // D as interrupt 0
 #define PORT_RELAY_PUMP       3 // D
+#define PORT_BARREL_IS_EMPTY 11 // D (on the left from D3 on dfrobot)
 
 // buttons - just aliases
 #define btnNONE   0
@@ -26,6 +27,10 @@
 // cursor position
 #define CUR_PRESS_LOW  1
 #define CUR_PRESS_HIGH 2
+
+// barrel is empty messages
+#define IS_EMPTY_LINE1 "                "
+#define IS_EMPTY_LINE2 "BARREL IS EMPTY!"
 
 // voltage to pressure mapping
 const unsigned int voltage_val[] = { 110, 220, 337, 454, 570, 690, 810, 920 };

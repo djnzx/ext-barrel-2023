@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #include "constants.h"
 #include "variables.h"
 #include "pump.h"
@@ -5,6 +6,7 @@
 #include "pressure.h"
 #include "display.h"
 #include "counter.h"
+#include "levels.h"
 
 ////////////////////////////////////////////////////////////////////////
 void setup() {
@@ -29,6 +31,7 @@ void setup() {
 
 ////////////////////////////////////////////////////////////////////////
 void read_sensors() {
+  is_empty = read_is_empty();
   pressure_current_volt = read_pressure_avg();
 }
 
