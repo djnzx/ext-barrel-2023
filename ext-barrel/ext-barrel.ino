@@ -54,6 +54,10 @@ void handle_keyboard() {
 
 // DO PUMP CONTROL BASED ON THE PRESSURE READ //////////////////////////
 void do_pump_control() {
+  if (is_empty) {
+    pumpOff();
+    return;
+  }
   if (is_manual_mode()) return;
   if (pressure_current_volt >= pressure_high_volt)                pumpOff();
   if (pressure_current_volt <= pressure_low_volt && !is_motor_on) pumpOn();
