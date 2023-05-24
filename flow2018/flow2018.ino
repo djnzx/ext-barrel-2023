@@ -18,13 +18,34 @@ void setup() {
   pressure_low = DEFAULT_MIN_VALUE;
   pressure_high = DEFAULT_MAX_VALUE;
   // port modes
-  pinMode(PORT_SENSOR_FLOW, INPUT); // used as interrupt
+  pinMode(PORT_SENSOR_FLOW, INPUT);
   pinMode(PORT_RELAY_PUMP, OUTPUT);
   init_pressure_averager();
   // flow
   attachHandler();
   // debug purposes
   Serial.begin(38400);
+}
+
+////////////////////////////////////////////////////////////////////////
+void read_sensors() {
+  pressure_current_volt = read_pressure_avg();
+}
+
+// HANDLE KEYBOARD, UPDATE global variables, DO PUMP SWITCH IN MANUAL MODE
+void handle_keyboard() {
+  switch (read_button()) {
+    case btnRIGHT:  handleBtnRight(); break;
+    case btnLEFT:   handleBtnLeft();  break;
+    case btnUP:     handleBtnUp();    break;
+    case btnDOWN:   handleBtnDown();  break;
+    case btnSELECT: pumpSwitch();  break;
+  }
+  // update sensor value
+  use_sensor = pressure_low < pressure_high;
+  // update voltage values for pressures
+  pressure_low_volt  = press_to_volt(pressure_low);
+  pressure_high_volt = press_to_volt(pressure_high);
 }
 
 // DO PUMP CONTROL BASED ON THE PRESSURE READ //////////////////////////
@@ -55,32 +76,11 @@ void handle_flow() {
   }
 }
 
-////////////////////////////////////////////////////////////////////////
-void read_sensors() {
-  pressure_current_volt = read_pressure_avg();
-}
-
-// HANDLE KEYBOARD, UPDATE global variables, DO PUMP SWITCH IN MANUAL MODE
-void handle_keyboard() {
-  switch (read_button()) {
-    case btnRIGHT:  selectHighP(); break;
-    case btnLEFT:   selectLowP();  break;
-    case btnUP:     buttonUp();    break;
-    case btnDOWN:   buttonDown();  break;
-    case btnSELECT: pumpSwitch();  break;
-  }
-  // update sensor value
-  use_sensor = pressure_low < pressure_high;
-  // update voltage values for pressures
-  pressure_low_volt  = press_to_volt(pressure_low);
-  pressure_high_volt = press_to_volt(pressure_high);
-}
-
 void loop() {
   read_sensors();
   handle_keyboard();
   do_pump_control();
   handle_flow();
-  display(lcd); // relies on `flow` variable
+  display(lcd); // relies on the `flow` variable
   delay(200);
 }

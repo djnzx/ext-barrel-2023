@@ -24,12 +24,8 @@ String intToReadable(unsigned int value, bool special) {
   int digit1 = value / 100;
   int digit2 = (value % 100) / 10;
   int digit3 = value % 10;
-  return
-    String(digit1)
-    + (special ? "*" : ".") +
-    String(digit2)
-    +
-    String(digit3);
+  String delimiter = special ? "*" : ".";
+  return String(digit1) + delimiter + String(digit2) + String(digit3);
 }
 
 String getLine1Content() {

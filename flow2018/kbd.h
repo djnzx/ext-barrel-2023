@@ -14,17 +14,21 @@ void inc_low()  { if (pressure_high - pressure_low > 1) pressure_low  += STEP; }
 void dec_high() { if (pressure_high - pressure_low > 1) pressure_high -= STEP; }
 void inc_high() { if (pressure_high < MAX_VALUE)        pressure_high += STEP; }
 
-void selectLowP()  { cursor_position = CUR_PRESS_LOW;  }
-
-void selectHighP() { cursor_position = CUR_PRESS_HIGH; }
-
-void buttonUp() {
-  if (cursor_position == CUR_PRESS_LOW) { inc_low();  }
-  else                                  { inc_high(); }
+void handleBtnRight() {
+  cursor_position = CUR_PRESS_HIGH;
 }
 
-void buttonDown() {
-  if (cursor_position == CUR_PRESS_LOW) { dec_low();  }
-  else                                  { dec_high(); }
+void handleBtnLeft() {
+  cursor_position = CUR_PRESS_LOW;
+}
+
+void handleBtnUp() {
+  if (cursor_position == CUR_PRESS_LOW) inc_low();
+  else                                  inc_high();
+}
+
+void handleBtnDown() {
+  if (cursor_position == CUR_PRESS_LOW) dec_low();
+  else                                  dec_high();
 }
 
