@@ -1,6 +1,6 @@
 // LCD
-#include <LiquidCrystal.h>
-LiquidCrystal lcd(8, 9, 4, 5, 6, 7);
+#include <LCD_I2C.h>
+LCD_I2C lcd(0x27, 20, 4);
 
 // safety stuff, start from empty barrel
 bool is_empty = true;
@@ -14,6 +14,7 @@ bool is_motor_on;
 // current pressures for on(low) / off(high), being set via UI
 int pressure_low;
 int pressure_high;
+bool is_manual() { return pressure_low == pressure_high; }
 
 // the same in volage, because sensor returns the voltage
 int pressure_low_volt;

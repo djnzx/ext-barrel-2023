@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include "constants.h"
-#include "variables.h"
+#include "globals.h"
 #include "pump.h"
 #include "kbd.h"
 #include "pressure.h"
@@ -10,8 +10,10 @@
 
 ////////////////////////////////////////////////////////////////////////
 void setup() {
-  // init display
-  lcd.begin(16, 2);
+  // idnit display
+  lcd.begin();
+  lcd.backlight();
+  // lcd.begin(16, 2);
   // initial cursor position
   cursor_position = CUR_PRESS_LOW;
   // initial motor state
@@ -37,8 +39,8 @@ void read_sensors() {
 }
 
 // HANDLE KEYBOARD, UPDATE global variables, DO PUMP SWITCH IN MANUAL MODE
-void handle_keyboard() {
-  switch (read_button()) {
+void handle_keyboard(LCD_I2C lcd0) {
+  switch (read_button(lcd0)) {
     case btnRIGHT:  handleBtnRight(); break;
     case btnLEFT:   handleBtnLeft();  break;
     case btnUP:     handleBtnUp();    break;
@@ -86,7 +88,7 @@ void handle_flow() {
 
 void loop() {
   read_sensors();
-  handle_keyboard();
+  handle_keyboard(lcd);
   do_pump_control();
   handle_flow();
   display(lcd); // relies on the `flow` variable

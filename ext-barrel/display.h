@@ -49,7 +49,8 @@ String mk_line2() {
     + " ";
 }
 
-void display(LiquidCrystal lcd0) {
+void display(LCD_I2C lcd0) {
   lcd0.setCursor(0, 0); lcd0.print(mk_line1());
   lcd0.setCursor(0, 1); lcd0.print(mk_line2());
+  lcd0.setCursor(0, 2); lcd0.print(is_manual() ? "manual": "      ");
 }

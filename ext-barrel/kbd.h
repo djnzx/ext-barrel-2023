@@ -1,10 +1,13 @@
-int read_button() {
+int read_button(LCD_I2C lcd0) {
   unsigned int in = analogRead(PORT_LCD_BUTTONS); // 0 - port, which used to read buttons
-  if (in < 50)   return btnRIGHT;   // 0
-  if (in < 150)  return btnUP;      // 97
-  if (in < 300)  return btnDOWN;    // 253
-  if (in < 450)  return btnLEFT;    // 405
-  if (in < 700)  return btnSELECT;  // 638
+  //lcd0.setCursor(0, 3); lcd0.print(in); lcd0.print("   "); // calibration purposes
+  lcd0.setCursor(19, 3);
+  if (in < 50)   { lcd0.print("R"); return btnRIGHT; }   // 0
+  if (in < 170)  { lcd0.print("U"); return btnUP;    }  // 131
+  if (in < 370)  { lcd0.print("D"); return btnDOWN;  }  // 307
+  if (in < 570)  { lcd0.print("L"); return btnLEFT;  }  // 480
+  if (in < 850)  { lcd0.print("S"); return btnSELECT;}  // 721
+  lcd0.print(" ");                                      // 1023 (pull-up 2k 5v)
   return btnNONE;
 }
 
